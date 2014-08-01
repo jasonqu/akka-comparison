@@ -1,6 +1,6 @@
 package com.oracle.sec6.immutable
 
-case class ImmutableRGBInScala(val red: Int, val green: Int, val blue: Int, val name: String = "") {
+case class ImmutableRGBInScala(val red: Int, val green: Int, val blue: Int, val name: String) {
   require(red >= 0 && red <= 255)
   require(green >= 0 && green <= 255)
   require(blue >= 0 && blue <= 255)

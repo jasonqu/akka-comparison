@@ -128,12 +128,49 @@ com.oracle.sec5.guarded_blocks.ProducerConsumerExampleInAkka
 
 scala对于不可变很重视，case class的实例就是不可变的对象
 
+可以看到scala中定义一个 ImmutableRGB 比 java 中要简洁很多
+
+com.oracle.sec6.immutable.ImmutableRGBInScala
+
+
+
+
+###High Level Concurrency Objects 高级并发对象
+
+####锁对象
+
+Akka不需要锁
+
+####执行器（Executors）、线程池
+
+Akka底层集成了java的Executors和线程池，所以我们可以不关注这些细节，Akka会自动利用系统资源进行多线程的处理
+
+http://doc.akka.io/docs/akka/2.3.4/scala/dispatchers.html
+
+####Fork/Join
+
+任务：模糊一张图片
+
+com.oracle.sec7.executors.ForkBlur
+
+标准实现中也大量运用了Fork/Join来做，包括java8中 java.util.Arrays类的一系列parallelSort()方法等。
+
+其他采用了fork/join框架的方法还包括java.util.streams包中的一些方法，此包是作为Java SE 8发行版中Project Lambda的一部分。
+
+Akka原生支持 Fork/Join 处理模式，可以在配置中选择该模式
+http://doc.akka.io/docs/akka/2.3.4/scala/dispatchers.html
+
+akka版 todo
+
+
+#### 并发集合 原子变量 并发随机数 略
+
+
+### Further Reading 略
+
+### Questions and Exercises
+
 TODO
-
-
-
-
-
 
 
 
