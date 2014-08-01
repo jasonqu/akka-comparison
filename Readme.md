@@ -16,6 +16,8 @@ com.oracle.sec2.thread_objects.HelloThread
 
 com.oracle.sec2.thread_objects.HelloAkka
 
+如java线程不同，akka执行完成后是不会自动退出的，需要手动杀进程，一般我们也不需要自动退出【TODO 自动退出程序？】
+
 #####使用Sleep方法暂停一个线程
 
 任务：每四秒打印一个信息
@@ -25,6 +27,10 @@ com.oracle.sec2.thread_objects.SleepMessages
 在Actor中，启动定时任务也是通过 system.scheduler 实现的，如果要结束定时任务，也需要通过程序触发
 
 com.oracle.sec2.thread_objects.SimpleMessagesInAkka
+
+还有更简化的写法，只用一个Actor
+
+com.oracle.sec2.thread_objects.SimpleMessageLoop2
 
 #####中断（Interrupts）
 
@@ -79,45 +85,46 @@ class Counter extends Actor {
 
 确立 happens-before关系，对Actor来说就是消息顺序
 
-TODO
-有许多操作会建立happens-before关系。其中一个是同步，我们将在下面的章节中看到。
+即在处理完这个消息之前，是不会处理下一消息的
 
-我们已经见过两个建立happens-before关系的操作。
+##### 同步方法、内部锁与同步、原子访问
 
-当一条语句调用Thread.start方法时，和该语句有happens-before关系的每一条语句，跟新线程执行的每一条语句同样有happens-before关系。创建新线程之前的代码的执行结果对线新线程是可见的。
-当一个线程终止并且当导致另一个线程中Thread.join返回时，被终止的线程执行的所有语句和在join返回成功之后的所有语句间有happens-before关系。线程中代码的执行结果对执行join操作的线程是可见的。
-要查看建立happens-before关系的操作列表，请参阅java.util.concurrent包的摘要页面。
-
-##### 同步方法
-
-Actor方案见"线程干扰"
-
-锁，我们都不关注
-
-#####原子访问
-
-有些操作你可以定义为原子的：
-
-对引用变量和大部分基本类型变量（除long和double之外）的读写是原子的。
-对所有声明为volatile的变量（包括long和double变量）的读写是原子的。
-
-对Actor可以不关注？
-
+Actor模型 都不关注，天然无风险
 
 
 ### Liveness 活跃度
 
 #### 死锁
 
-Actor 模型中没有死锁
+任务：每一个人被鞠躬之后都要鞠躬回来以示礼节。但是这段代码由于使用了相同的锁，导致了死锁情况的出现
+
+com.oracle.sec4.liveness.Deadlock
+
+Actor 模型中没有使用锁，所以不存在死锁
+
+com.oracle.sec4.liveness.DeadlockInAkka
+
+####饥饿和活锁
+
+归功于Actor模型的无锁特性，这两种情况在Akka中也不存在
 
 ### Guarded Blocks
 
-使用notify实现一个简单的生产者消费者模型
+多线程之间经常需要协同工作，最常见的方式是使用Guarded Blocks，它循环检查一个条件（通常初始值为true），直到条件发生变化才跳出循环继续执行。
 
-TODO Actor
+使用notify实现一个简单的生产者消费者模型：
 
-###不可变对象
+资源是字符串，一个资源槽只能容纳一个资源。
+一个生产者隔一秒生成一个字符串需要放到资源槽中，如果槽满就等待，直到被唤醒。最后放入Done标识结束
+一个消费者隔一秒从资源槽中获取并消费一个字符串，如果槽空就等待，直到被唤醒。最后收到Done标识结束
+
+com.oracle.sec5.guarded_blocks.ProducerConsumerExample
+
+Actor模型相对简单，一个Master通过消息控制生产者的生产和消费者的消费，达到相同效果
+
+com.oracle.sec5.guarded_blocks.ProducerConsumerExampleInAkka
+
+###Immutable Objects 不可变对象
 
 scala对于不可变很重视，case class的实例就是不可变的对象
 
